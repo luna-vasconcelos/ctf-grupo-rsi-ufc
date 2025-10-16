@@ -1,0 +1,50 @@
+[
+  {
+    "username": "alice",
+    "email": "alice@spooku.edu",
+    "phone": "+55 85 9 1234-5678",
+    "address": "13 Elm St, Graveyard District",
+    "card_last4": "4242",
+    "plan": "Student Plus",
+    "notes": "Committee volunteer; access to /admin preview",
+    "orders": [
+      {
+        "id": "ORD-1001",
+        "item": "Granite epitaph",
+        "price": 49.9
+      }
+    ]
+  },
+  {
+    "username": "bob",
+    "email": "bob@spooku.edu",
+    "phone": "+55 11 9 8765-4321",
+    "address": "666 Crypt Ave, Necropolis",
+    "card_last4": "1337",
+    "plan": "Student Basic",
+    "notes": "Late payment last month",
+    "orders": [
+      {
+        "id": "ORD-1002",
+        "item": "Marble epitaph",
+        "price": 69.9
+      }
+    ]
+  },
+  {
+    "username": "carol",
+    "email": "carol@spooku.edu",
+    "phone": "+55 21 9 0000-0000",
+    "address": "1 Pumpkin Patch Rd, Hollow",
+    "card_last4": "0005",
+    "plan": "Alumni",
+    "notes": "Design judge",
+    "orders": [
+      {
+        "id": "ORD-1003",
+        "item": "Sandstone epitaph",
+        "price": 29.9
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gerador de Lápide</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=(meta.release or 'dev')) }}">
+
+  </head>
+  <body class="mat-{{ request.form.get('material','granite') if request else 'granite' }}">
+    <header>
+      <h1>🪦 Gerador de Lápide</h1>
+      <p class="subtitle">Crie lápides assustadores para o Halloween!!!!</p>
+      {% if user %}<div class="user-chip">Login: {{ user.username }}</div>{% endif %}
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+      <small>Propriedade RSI UFC.</small>
+    </footer>
+  </body>
+</html>

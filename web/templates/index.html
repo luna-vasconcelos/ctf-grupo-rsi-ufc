@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<form action="/preview" method="post" class="card grid">
+  <div>
+    <label>Nome</label>
+    <input type="text" name="inscription" placeholder="Dr. Ada Lovelace">
+  </div>
+  <div class="row">
+    <div>
+      <label>Nascimento</label>
+      <input type="text" name="born" placeholder="1815">
+    </div>
+    <div>
+      <label>Morte</label>
+      <input type="text" name="died" placeholder="1852">
+    </div>
+  </div>
+  <div>
+    <label>Texto da lápide (epitáfio)</label>
+    <textarea name="epitaph_template" rows="4" placeholder="— Rest in peace —"></textarea>
+  </div>
+  <div class="row">
+    <div>
+      <label>Forma</label>
+      <select name="shape">
+        <option>classic</option>
+        <option>obelisk</option>
+        <option>cross</option>
+        <option>tablet</option>
+      </select>
+    </div>
+    <div>
+      <label>Cor</label>
+      <select name="material">
+        <option>granite</option>
+        <option>marble</option>
+        <option>sandstone</option>
+        <option>basalt</option>
+      </select>
+    </div>
+    <div>
+      <label>Ornamento</label>
+      <select name="ornament">
+        <option>skull</option>
+        <option>bat</option>
+        <option>cobweb</option>
+        <option>rose</option>
+        <option>raven</option>
+      </select>
+    </div>
+    <div>
+      <label>Fonte</label>
+      <select name="font">
+        <option>gothic</option>
+        <option>cursive</option>
+        <option>runes</option>
+        <option>serif</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit">Visualizar</button>
+</form>
+
+<!-- <div class="tip card">
+  <strong>Dica:</strong> Alterne o contexto do usuário via <code>?as_user=alice</code> na URL inicial.
+</div> -->
+{% endblock %}

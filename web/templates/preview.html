@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card preview">
+  {{ hint }}
+  <h2>Preview</h2>
+  <div class="stone shape-{{ shape }} mat-{{ material }}">
+    <div class="ornament orn-{{ ornament }}"></div>
+    <div class="inscription font-{{ font }}">
+      <div class="name">{{ inscription }}</div>
+      <div class="years">{{ born }} — {{ died }}</div>
+      <div class="epitaph">{{ epitaph|safe }}</div>
+    </div>
+  </div>
+  <a href="/" class="back">← back</a>
+</div>
+{% endblock %}
