@@ -2,6 +2,7 @@ import os, json, random
 from flask import Flask, render_template, request, make_response, g
 from markupsafe import Markup, escape
 from jinja2 import Environment, FileSystemLoader, select_autoescape, StrictUndefined
+import re
 
 app = Flask(__name__)
 
@@ -9,27 +10,31 @@ app = Flask(__name__)
 def inject_meta():
     return {"meta": {"release": os.getenv("RELEASE_SHA", "")}}
 
-# Toggle: Seguro por padrão (sem SSTI). Ativar em execuções de CTF.
+# Toggle pro ctf
 CHALLENGE_MODE = os.getenv("CHALLENGE_MODE", "on").lower() in ("1", "true", "on", "yes", "y", "sim")
 
-# Ambiente Jinja SEGURO: StrictUndefined evita "pescaria" silenciosa de variáveis
-jinja_safe = Environment(
-    loader=FileSystemLoader("templates"),
-    autoescape=select_autoescape(["html", "xml"]),
-    undefined=StrictUndefined,
-)
-
-# Ambiente Jinja INSEGURO (para o CTF), só habilitado se CHALLENGE_MODE=on
+# Ambiente Jinja inseguro
 jinja_ctf = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape(["html", "xml"]),
 )
 
-def naive_sanitize(s: str) -> str:
-    # Sanitização *ingênua* apenas para dificultar payloads triviais.
-    # NÃO confie nisso para segurança real.
-    return s.replace("{%", "").replace("%}", "")
+def sanitize(s: str) -> str:
 
+    blocked = [
+        "mro", "subclasses", "bases",
+        "read", "write", "eval", "exec",
+        "sys", "system",
+        "config", "application", "wsgi",
+        "request", "self", "builtins",
+        "namespace", "joiner","popen",
+        "getattr", "getitem", "attr",
+    ]
+    s = re.sub("(" + "|".join(re.escape(t) for t in blocked) + ")", "", s, flags=re.I)
+
+    return s
+
+# login de usuário mock
 def load_user(username: str | None):
     try:
         with open("data/users.json", "r", encoding="utf-8") as f:
@@ -44,7 +49,7 @@ def load_user(username: str | None):
         return {"username": "visitante", "email": "visitante@spooku.edu", "plan": "Convidado"}
 
 def build_context(user: dict):
-    # Contexto mínimo; sem chaves de SMTP/API (removidas do compose)
+    # Contexto mínimo
     theme = {
         "shapes": ["classic", "obelisk", "cross", "tablet"],
         "materials": ["granite", "marble", "sandstone", "basalt"],
@@ -60,7 +65,7 @@ def build_context(user: dict):
     support = os.getenv("SUPPORT_EMAIL", "suporte@example.com")
     ctx["meta"] = {"release": release, "support": support}
 
-    # Decoys opcionais para sessões de CTF (sem segredos reais)
+    # Decoys para CTF (sem dados reais)
     if CHALLENGE_MODE:
         ctx["decoys"] = {
             "build": release,
@@ -95,7 +100,7 @@ def index():
             request.args["as_user"],
             httponly=True,
             samesite="Lax",
-            secure=False,  # definir true se for HTTPS
+            secure=False,  
             max_age=7 * 24 * 3600,
         )
     return resp
@@ -109,11 +114,6 @@ def preview():
         or request.form.get("inscricao")
         or "Em memória"
     )
-    # epitaph_template = (
-    #     request.form.get("epitaph_template")
-    #     or request.form.get("epitafio")
-    #     or "— Descanse em paz —"
-    # )
     epitaph_template = request.form.get("epitaph_template","— Rest in peace —")
     shape = request.form.get("shape", "classic")
     material = request.form.get("material", "granite")
@@ -129,14 +129,13 @@ def preview():
 
     # Caminho SEGURO por padrão: trata input como texto (escapado)
     epitaph_safe_text = escape(epitaph_template)
-    epitaph = Markup(epitaph_safe_text)  # renderiza como texto literal
+    epitaph = Markup(epitaph_safe_text)  
     hint = "<!-- modo seguro: nenhum template é avaliado -->"
 
     # Caminho CTF: avalia template controlado pelo usuário com contexto
     if CHALLENGE_MODE:
         try:
-            rendered = jinja_ctf.from_string(naive_sanitize(epitaph_template)).render(**ctx)
-            # epitaph = Markup(rendered)  # entrega exatamente o que foi renderizado
+            rendered = jinja_ctf.from_string(sanitize(epitaph_template)).render(**ctx)
         except Exception:
             epitaph = Markup(epitaph_safe_text)
             hint = "<!-- erro de renderização; texto em modo seguro -->"
