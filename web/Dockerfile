@@ -10,8 +10,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir gunicorn
 
+# RUN apt-get update \
+#     && apt-get install -y --no-install-recommends netcat-openbsd \
+#     && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
+<<<<<<< HEAD
 # --- CORREÇÃO AQUI ---
 
 # 1. Crie a flag COMO ROOT durante o build. O arquivo já existirá no contêiner.
@@ -36,4 +41,12 @@ EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Comando padrão a ser executado pelo entrypoint
+=======
+RUN echo "RSI{suSsURRo_do_cem1t3rio_flag1}" > /app/flag1.txt && \
+    chmod 444 /app/flag1.txt
+
+USER root
+EXPOSE 8080
+
+>>>>>>> origin/updates-containers
 CMD ["gunicorn", "-w", "2", "-k", "gthread", "--threads", "4", "--bind", "0.0.0.0:8080", "app:app"]

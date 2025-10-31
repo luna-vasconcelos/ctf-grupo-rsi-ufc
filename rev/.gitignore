@@ -1,2 +1,5 @@
 *.o
 .env
+*.unpack
+*.efi
+key.txt
