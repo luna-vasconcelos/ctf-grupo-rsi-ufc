@@ -5,9 +5,9 @@ BANNER = (
     b"type something and hit enter; 'quit' to exit\n\n"
 )
 
+# chat simples para testar o ambiente
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
-        # greet on connect
         self.wfile.write(BANNER)
         self.wfile.flush()
 
