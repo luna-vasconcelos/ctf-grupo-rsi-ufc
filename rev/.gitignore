@@ -2,4 +2,4 @@
 .env
 *.unpack
 *.efi
-key.txt
+*.txt
