@@ -40,6 +40,8 @@ services:
     networks: ["internal"]      
 
   rev-ssh:
-    build: ./rev
+    build:
+      context: ./rev
+      dockerfile: Dockerfile
     ports: ["2222:22"]                   
     networks: ["public"]                 
