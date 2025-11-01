@@ -1,8 +1,11 @@
 version: "3.9"
 
 networks:
-  public:   { driver: bridge }          
-  internal: { driver: bridge, internal: true }  
+  public:   { driver: bridge }
+  internal: { driver: bridge, internal: true }
+
+volumes:
+  tcpchat_shared:
 
 services:
   web:
@@ -14,10 +17,13 @@ services:
     env_file:
       - env.file
     environment:
-      CHAT_HOST: tcpchat    # DNS = service name
-      CHAT_PORT: "1337"
+      CHAT_HOST: tcpchat
+      CHAT_PORT: "1337"          # só é usado se conectando por nc tcpchat
+      PORT_FILE: /run/tcpchat/port
+      DESIRED_FILE: /run/tcpchat/desired
     depends_on:
-      - tcpchat
+      tcpchat:
+        condition: service_healthy
     networks: ["public","internal"]
     restart: unless-stopped
     healthcheck:
@@ -31,15 +37,35 @@ services:
       - ALL
     tmpfs:
       - /tmp
-
-  tcpchat:
+    volumes:
+      - tcpchat_shared:/run/tcpchat
+      
+  tcpcore:
     build: ./tcpchat
     environment:
       KEY_HEX: "deadbeefcafebabe0011223344556677"
-    ports: ["1337:1337"]                 
-    networks: ["internal"]      
+    networks: ["internal"]
+
+  tcpchat:
+    build:
+      context: ./tcpchat-proxy
+    depends_on:
+      - tcpcore
+    networks: ["internal"]
+    volumes:
+      - tcpchat_shared:/run/tcpchat
+    environment:
+      TARGET_HOST: tcpcore
+      TARGET_PORT: "1337"
+      ROTATE_SECS: "20"
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /run/tcpchat/port && pidof socat >/dev/null"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 2s
 
   rev-ssh:
     build: ./rev
-    ports: ["2222:22"]                   
-    networks: ["public"]                 
+    ports: ["2222:22"]
+    networks: ["public"]
